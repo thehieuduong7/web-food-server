@@ -5,7 +5,6 @@ class AuthService < ApplicationService
   }
 
   # private
-
   def encode_token(payload, secret_key, exp = 1.hours.from_now)
     payload[:exp] = exp.to_i
     JWT.encode(payload, secret_key, 'HS256', HEADER_FIELDS)
@@ -15,35 +14,22 @@ class AuthService < ApplicationService
   def decoded_token(token, secret_key)
     JWT.decode(token, secret_key, true, algorithm: 'HS256')
   rescue JWT::DecodeError
-    raise Error::ApplicationError, Error::TypeError::INVALID_TOKEN
+    raise Error::Unauthorized.new("Invalid token")
   end
 
   # TODO: login account and return token
-  # @params form {username, password, remember_me}
+  # @params form {username, password, is_remember}
   # @params find_users callback find user
   def login_service(form)
     user = User.is_active.find_by!(email: form[:email])
     raise StandardError unless UsersService.instance.equal_hash?(user[:password], form[:password])
-
     payload = {
       **user.slice(:id, :is_admin)
     }
-
-
-
-
-
-    exp = form[:remember] ? (7 * 24).hours.from_now : 24.hours.from_now
+    exp = form[:is_remember] ? (7 * 24).hours.from_now : 24.hours.from_now
     encode_token(payload, ENV['SECRET_KEY_ACCESS_TOKEN'], exp)
-
-
-
   rescue StandardError
-
-
-
-    raise Error::ApplicationError.new(Error::TypeError::UNAUTHENTICATION,
-                                      "username or password incorrect")
+    raise Error::Unauthorized.new("Username or password incorrect")
   end
 
   # TODO: register
@@ -65,7 +51,7 @@ class AuthService < ApplicationService
     exp = 24.hours.from_now
     encode_token(payload, ENV['SECRET_KEY_ACCESS_TOKEN'], exp)
   rescue ActiveRecord::RecordInvalid => e
-    raise Error::ApplicationError.new(Error::TypeError::BAD_REQUEST, e.record.errors.full_messages[0])
+    raise Error::BadRequest(e.record.errors.full_messages[0])
   end
 
   # @params token string
@@ -74,8 +60,7 @@ class AuthService < ApplicationService
     begin
       User.is_active.find(payload['id'])
     rescue StandardError
-      raise Error::ApplicationError.new(Error::TypeError::NOT_FOUND_RESOURCE,
-                                        'not found user')
+      raise Error::NotFound.new("Not found user")
     end
   end
 end

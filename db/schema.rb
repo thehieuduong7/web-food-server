@@ -40,7 +40,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_05_105450) do
     t.float "price"
     t.integer "total_sold"
     t.float "percent_sale"
-    t.string "status"
+    t.boolean "is_active"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

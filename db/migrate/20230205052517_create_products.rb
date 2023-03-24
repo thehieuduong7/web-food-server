@@ -6,7 +6,7 @@ class CreateProducts < ActiveRecord::Migration[7.0]
       t.float :price
       t.integer :total_sold
       t.float :percent_sale
-      t.string :status
+      t.boolean :is_active
       t.timestamps
     end
   end
