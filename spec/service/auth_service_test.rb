@@ -1,7 +1,7 @@
 require 'rails_helper'
 
-RSpec.describe UserService do
-  let!(:user_service) {UserService.new}
+RSpec.describe UsersService do
+  let!(:user_service) {UsersService.new}
   describe '#hash password' do
     it 'input valid password' do
       password = '123QWEasd'

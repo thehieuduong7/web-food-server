@@ -1,4 +1,4 @@
-class UserService < ApplicationService
+class UsersService < ApplicationService
   def hash_bcrypt(salt)
     BCrypt::Password.create(salt).to_s
   end

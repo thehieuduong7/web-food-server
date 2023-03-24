@@ -23,16 +23,27 @@ class AuthService < ApplicationService
   # @params find_users callback find user
   def login_service(form)
     user = User.is_active.find_by!(email: form[:email])
-    raise StandardError unless UserService.instance.equal_hash?(user[:password], form[:password])
+    raise StandardError unless UsersService.instance.equal_hash?(user[:password], form[:password])
 
     payload = {
       **user.slice(:id, :is_admin)
     }
+
+
+
+
+
     exp = form[:remember] ? (7 * 24).hours.from_now : 24.hours.from_now
     encode_token(payload, ENV['SECRET_KEY_ACCESS_TOKEN'], exp)
+
+
+
   rescue StandardError
+
+
+
     raise Error::ApplicationError.new(Error::TypeError::UNAUTHENTICATION,
-                                      'username or password incorrect')
+                                      "username or password incorrect")
   end
 
   # TODO: register

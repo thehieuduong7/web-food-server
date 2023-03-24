@@ -7,11 +7,12 @@
 #   Character.create(name: "Luke", movie: movies.first)
 
 # TODO: Seed user
-user_service = UserService.new
+user_service = UsersService.new
 password = '123QWEasd'
 # seed admin
 User.create(
   {
+    id: 1,
     email: 'admin@gmail.com',
     password: user_service.hash_bcrypt(password),
     first_name: 'admin',
@@ -23,6 +24,7 @@ User.create(
 )
 users = (1..20).reduce([]) do |assume, current|
   user = {
+    id: current+1,
     email: "user#{current}@gmail.com",
     password: user_service.hash_bcrypt(password),
     first_name: Faker::Name.first_name,
@@ -38,3 +40,36 @@ users = (1..20).reduce([]) do |assume, current|
   assume.append(user)
 end
 User.create(users)
+# seed categories
+
+categories = (1..10).reduce([]) do |assume, current|
+  category = {
+    id: current,
+    name: Faker::Food.ethnic_category,
+    description: Faker::Food.description,
+    url: Faker::Avatar.image(slug: 'my-own-slug', size: '50x50', format: 'jpg')
+  }
+  assume.append(category)
+end
+Category.create(categories)
+
+# seed products
+
+products = (1..20).reduce([]) do |assume, current|
+  product = {
+    id: current,
+    name: Faker::Food.dish,
+    description: Faker::Food.description,
+    price: Faker::Number.between(from: 1, to: 20) * 1000,
+    total_sold: Faker::Number.between(from: 100, to: 200),
+    percent_sale: Faker::Number.between(from: 0.0, to: 1.0).round(2),
+    status: ["active","inactive"].sample,
+    categories:
+  }
+  assume.append(product)
+
+end
+Product.upsert_all(products)
+
+# seed prodcut_images
+product_images = Product.all()
